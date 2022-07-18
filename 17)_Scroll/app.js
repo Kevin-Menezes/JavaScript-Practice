@@ -28,10 +28,11 @@ navToggle.addEventListener('click', function () {
 
 });
 
+// ********** fixed navbar ************
+
 const navbar = document.getElementById('nav');
 const topLink = document.querySelector('.top-link');
 
-// ********** fixed navbar ************
 window.addEventListener('scroll', function () {
     
     const scrollHeight = window.pageYOffset; // As u scroll down the scroll height number increases
@@ -67,11 +68,25 @@ scrollLinks.forEach(function (link) {
         // Navigate to specific spot
         const id = e.currentTarget.getAttribute('href').slice(1);
         const element = document.getElementById(id);
-        let position = element.offsetTop;
+
+        // Calculate the heights
+        const navHeight = navbar.getBoundingClientRect().height;
+        const containerHeight = linksContainer.getBoundingClientRect().height;
+        const fixedNav = navbar.classList.contains('fixed-nav');
+        let position = element.offsetTop - navHeight;
+
+        if (!fixedNav) {
+            position = position - navHeight;
+        }
+        if (navHeight > 82) {
+            position = position + containerHeight;
+        }
+
         window.scrollTo({
             left: 0,
             top: position,
         });
+        // Close
         linksContainer.style.height = 0;
     });
 });
