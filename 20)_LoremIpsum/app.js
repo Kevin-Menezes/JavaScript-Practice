@@ -31,7 +31,7 @@ form.addEventListener('submit', function (e) {
     tempText = tempText.map(function (item) {
       
       return `<p class="result">${item}</p>`;
-    }).join(" ");
+    }).join(" "); // This is to remove the commas between the array so it acts as 1 whole piece of html code
 
     result.innerHTML = tempText;
   }
