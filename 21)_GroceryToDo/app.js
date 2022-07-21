@@ -19,7 +19,8 @@ let editId = '';
 form.addEventListener('submit', addItem);
 // Clear items
 clearBtn.addEventListener('click', clearItems);
-
+// Load items
+window.addEventListener('DOMContentLoaded', setupItems);
 
 
 // ********* FUNCTIONS *************
@@ -30,24 +31,8 @@ function addItem(e) {
     
     // Adding new item
     if (value && !editFlag) {
-        const element = document.createElement('article'); // creating element
-        element.classList.add('grocery-item'); // setting class for element
-        const attr = document.createAttribute('data-id'); // setting id for element
-        attr.value = id;
-        element.setAttribute(attr);
-        element.innerHTML = `<p class="title">${value}</p>
-
-            <div class="btn-container">
-              <button type="button" class="edit-btn">
-                <i class="fa fa-edit"></i>
-              </button>
-              <button type="button" class="delete-btn">
-                <i class="fa fa-trash"></i>
-              </button>
-            </div>`;
+        createListItem(id, value);
         
-        // Append child
-        list.appendChild(element);
         // Display alert
         displayAlert("item added to the list", "success");
         // Show container
@@ -59,7 +44,12 @@ function addItem(e) {
         
     }
     else if (value && editFlag) {
-        
+
+        editElement.innerHTML = value;
+        displayAlert('value changed', 'success');
+        // Edit local storage
+        editLocalStorage(editId, value);
+        setBackToDefault();
     }
     else {
         displayAlert("please enter value", "danger");
@@ -91,6 +81,33 @@ function clearItems() {
     container.classList.remove("show-container");
     displayAlert("empty list", "danger");
     setBackToDefault();
+    localStorage.removeItem('list');
+}
+
+// Delete function
+function deleteItem() {
+    const element = e.currentTarget.parentElement.parentElement;
+    const id = element.dataset.id;
+    list.removeChild(element);
+    if (list.children.length === 0) {
+        container.classList.remove("show-container");
+    }
+    displayAlert("item removed", "danger");
+    setBackToDefault();
+}
+
+// Edit function
+function editItem() {
+    const element = e.currentTarget.parentElement.parentElement;
+
+    // Set edit item
+    editElement = e.currentTarget.parentElement.previousElementSibling;
+
+    // Set form value
+    grocery.value = editElement.innerHTML;
+    editFlag = true;
+    editId = element.dataset.id;
+    submitBtn.textContent = "edit";
 }
 
 // Set back to default
@@ -104,8 +121,72 @@ function setBackToDefault() {
 
 // ****** LOCAL STORAGE **********
 function addToLocalStorage(id, value) {
-    console.log("added to storage");
+    const grocery = { id: id, value: value };
+    let items = getLocalStorage();
+    items.push(grocery);
+    localStorage.setItem('list', JSON.stringify(items));
 }
 
+function removeFromLocalStorage(id) {
+    let items = getLocalStorage();
+    items = items.filter(function (item) {
+        if (item.id !== id) {
+            return item;
+        }
+    });
+    localStorage.setItem('list', JSON.stringify(items));
+}
+
+function editLocalStorage(id, value) {
+    let items = getLocalStorage();
+    items = items.map(function (item) {
+        if (item.id === id) {
+            item.value = value;
+        }
+        return item;
+    });
+    localStorage.setItem('list', JSON.stringify(items));
+}
+
+function getLocalStorage() {
+    return localStorage.getItem("list") ? JSON.parse(localStorage.getItem("list")) : [];
+}
 
 // ****** SETUP ITEMS **********
+function setupItems() {
+    
+    let items = getLocalStorage();
+    if (items.length > 0) {
+        items.forEach(function (item) {
+            createListItem(item.id,item.value)
+        });
+        container.classList.add("show-container");
+    }
+}
+
+function createListItem(id, value) {
+    const element = document.createElement('article'); // creating element
+    element.classList.add('grocery-item'); // setting class for element
+    const attr = document.createAttribute('data-id'); // setting id for element
+    attr.value = id;
+    element.setAttribute(attr);
+    element.innerHTML = `<p class="title">${value}</p>
+
+            <div class="btn-container">
+              <button type="button" class="edit-btn">
+                <i class="fa fa-edit"></i>
+              </button>
+              <button type="button" class="delete-btn">
+                <i class="fa fa-trash"></i>
+              </button>
+            </div>`;
+
+    const deleteBtn = element.querySelector('.delete-btn');
+    const editBtn = element.querySelector('.edit-btn');
+
+    deleteBtn.addEventListener('click', deleteItem);
+    editBtn.addEventListener('click', editItem);
+
+    // Append child
+    list.appendChild(element);
+}
