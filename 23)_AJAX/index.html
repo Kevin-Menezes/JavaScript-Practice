@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script>
+        function loadAboutInfo() {
+
+            var request = new XMLHttpRequest(); // Instatiating object
+
+            request.open("GET", "data.json"); // (Method,File name)
+
+            request.onreadystatechange = function () {
+
+                if (this.readyState == 4 && this.status == 200) {
+
+                    let obj = JSON.parse(this.responseText);
+
+                    document.querySelector('#container').innerHTML = obj.heading;
+                }
+            }
+
+            request.send();
+
+        }
+    </script>
+
+    
+</head>
+<body>
+    <h1>Welcome home</h1>
+    <h2>Learning Ajax</h2>
+    <a href="./about.html">Go to about</a>
+    <button onclick="loadAboutInfo();">Load about</button>
+
+    <div id="container"></div>
+
+</body>
+</html>
