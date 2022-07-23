@@ -1,0 +1,59 @@
+<!-- Getting data asynchronously from a text file -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AJAX - Text File</title>
+</head>
+<body>
+    <button id="button">Get Text File</button>
+    <div id="text"></div>
+
+
+    <script>
+
+        // Event listener
+        const button = document.getElementById('button');
+        button.addEventListener('click',loadText);
+
+        function loadText(){
+            
+            // Create XHR object
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET','sample.txt',true); // (Action,File name)
+
+            // Optional for loaders... to show the round round animation
+            xhr.onprogress = function(){
+                console.log('READY STATE : ',xhr.readyState);
+            }
+
+            // xhr.onload = function(){
+            //     if(this.status == 200){
+            //         console.log(this.responseText);
+            //     }
+            // }
+
+            // This and the above function perform same things
+            xhr.onreadystatechange = function(){
+                if(this.readyState==4 && this.status==200){
+                    console.log('READY STATE : ', xhr.readyState);
+                    document.getElementById('text').innerHTML = this.responseText;
+                }
+            }
+
+            // Error
+            xhr.onerror = function(){
+                console.log("Error occured!");
+            }
+
+            xhr.send();
+        }
+
+    </script>
+
+    
+</body>
+</html>
